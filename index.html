@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" media="screen" href="index.css" />
+    <title>COVID 19</title>
+  </head>
+
+  <body>
+    <canvas id="chart" width="480" height="240"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script type="module">
+      import { getTotalCasesByDate } from "./databog.js";
+
+      // Creación de la grafica que es una instancía de la libreria chart.js
+      function totalCasesChart(data, ctx) {
+        debugger;
+        // Deconstrucción de los array (separación de tipos de casos)
+        const { Leve, Moderado, Grave, Recuperado, Fallecido } = data;
+
+        const chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: Fallecido.map((item) =>
+              new Intl.DateTimeFormat("es-CO", {
+                month: "long",
+                day: "numeric",
+              }).format(new Date(item.date))
+            ),
+            datasets: [
+              {
+                label: "Muertes",
+                borderColor: "purple",
+                data: Fallecido.map((item) => item.cases),
+              },
+              // {
+              //   label: "Leve",
+              //   borderColor: "green",
+              //   data: Leve.map((item) => item.cases),
+              // },
+              // {
+              //   label: "Moderado",
+              //   borderColor: "orange",
+              //   data: Moderado.map((item) => item.cases),
+              // },
+              // {
+              //   label: "Grave",
+              //   borderColor: "red",
+              //   data: Grave.map((item) => item.cases),
+              // },
+            ],
+          },
+          // Opciones Generales del del grafico: Textos, font, tamaño, color
+          options: {
+            scales: {
+              xAxes: [
+                {
+                  gridLines: {
+                    display: false,
+                  },
+                },
+              ],
+            },
+            title: {
+              display: true,
+              text: "Muertes COVID-19 Bogotá",
+              fontSize: 30,
+              padding: 30,
+              fontColor: "#12619c",
+            },
+            legend: {
+              position: "top",
+              labels: {
+                padding: 20,
+                boxWidth: 15,
+                fontFamily: "system-ui",
+                fontColor: "black",
+              },
+            },
+            layout: {
+              padding: {
+                right: 50,
+              },
+            },
+            // Recuadro de información por punto
+            tooltips: {
+              backgroundColor: "#0584f6",
+              titleFontSize: 20,
+              xPadding: 20,
+              yPadding: 20,
+              bodyFontSize: 15,
+              bodySpacing: 10,
+              mode: "x",
+            },
+            // Elementos dentro del grafico
+            elements: {
+              line: {
+                borderWidth: 6,
+                fill: false,
+              },
+              // Puntos dentro del grafico
+              point: {
+                radius: 4,
+                borderWidth: 1,
+                backgroundColor: "white",
+                hoverRadius: 8,
+                hoverBorderWidth: 3,
+              },
+            },
+          },
+        });
+      }
+
+      async function renderCharts() {
+        const ctx = document.querySelector("#chart").getContext("2d");
+        const data = await getTotalCasesByDate();
+        totalCasesChart(data, ctx);
+      }
+
+      renderCharts();
+    </script>
+  </body>
+</html>
